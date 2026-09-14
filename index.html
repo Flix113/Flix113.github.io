@@ -2,7 +2,7 @@
 <html lang="ro" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gabriela Quizz</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -61,28 +61,32 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 24px;
+            padding: 16px;
             background-image: 
                 radial-gradient(at 10% 10%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
                 radial-gradient(at 90% 90%, rgba(59, 130, 246, 0.12) 0px, transparent 50%);
             background-attachment: fixed;
+            overflow-x: hidden;
         }
 
         .container {
             width: 100%;
             max-width: 850px;
+            padding-bottom: 40px; /* Asigură vizibilitatea părții de jos pe mobil */
         }
 
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             padding-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 12px;
         }
 
         header h1 {
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: 800;
             background: linear-gradient(135deg, var(--accent-primary), var(--accent-police));
             -webkit-background-clip: text;
@@ -93,22 +97,22 @@
         .header-controls {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .theme-toggle {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             color: var(--text-primary);
-            width: 42px;
-            height: 42px;
+            width: 40px;
+            height: 40px;
             border-radius: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
             box-shadow: var(--shadow);
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
 
         .theme-toggle:hover {
@@ -118,12 +122,12 @@
         .user-badge {
             background: var(--card-bg);
             border: 1px solid var(--card-border);
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: 12px;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             color: var(--text-secondary);
         }
 
@@ -146,7 +150,7 @@
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 20px;
-            padding: 32px;
+            padding: 24px;
             backdrop-filter: blur(16px);
             box-shadow: var(--shadow);
             margin-bottom: 24px;
@@ -155,29 +159,31 @@
 
         .nav-tabs {
             display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
+            gap: 8px;
+            margin-bottom: 20px;
             background: rgba(0, 0, 0, 0.05);
             padding: 6px;
             border-radius: 14px;
             border: 1px solid var(--card-border);
+            overflow-x: auto;
         }
 
         .tab-btn {
             flex: 1;
-            padding: 12px 16px;
+            padding: 10px 14px;
             background: transparent;
             border: none;
             color: var(--text-secondary);
             border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.88rem;
             transition: all 0.25s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
+            white-space: nowrap;
         }
 
         .tab-btn.active {
@@ -189,8 +195,8 @@
 
         .grid-buttons {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
             margin-bottom: 20px;
         }
 
@@ -211,7 +217,7 @@
 
         input[type="text"], input[type="number"], select {
             width: 100%;
-            padding: 14px 18px;
+            padding: 14px 16px;
             border-radius: 12px;
             border: 1px solid var(--card-border);
             background: var(--input-bg);
@@ -226,11 +232,11 @@
 
         .btn {
             width: 100%;
-            padding: 16px;
+            padding: 14px 18px;
             border-radius: 12px;
             border: none;
             font-weight: 700;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             cursor: pointer;
             transition: all 0.25s ease;
             display: flex;
@@ -279,25 +285,24 @@
         .option-btn {
             width: 100%;
             text-align: left;
-            padding: 16px 20px;
-            margin-bottom: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
             border-radius: 12px;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--card-border);
             color: var(--text-primary);
             cursor: pointer;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             font-weight: 500;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .option-btn:hover:not(:disabled) {
             background: rgba(99, 102, 241, 0.1);
             border-color: var(--accent-primary);
-            transform: translateX(4px);
         }
 
         .option-btn.correct {
@@ -319,7 +324,7 @@
             background: var(--badge-bg);
             border-left: 4px solid var(--accent-primary);
             border-radius: 8px;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             color: var(--text-primary);
             line-height: 1.5;
             animation: slideDown 0.3s ease-out;
@@ -329,67 +334,78 @@
         .history-list {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
         }
 
         .history-card {
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--card-border);
             border-radius: 14px;
-            padding: 20px;
+            padding: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 10px;
         }
 
         .history-info h4 {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .history-info p {
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             color: var(--text-secondary);
         }
 
         .score-badge {
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: 20px;
             font-weight: 800;
-            font-size: 0.95rem;
+            font-size: 0.88rem;
+            white-space: nowrap;
         }
 
         .score-high { background: rgba(16, 185, 129, 0.15); color: var(--success); }
         .score-mid { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
         .score-low { background: rgba(239, 44, 44, 0.15); color: var(--danger); }
 
-        /* LOADER & MODAL */
+        /* MODALE & AMBIEȚIÂ ÎNCEȚOȘATĂ */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
+            background: rgba(11, 15, 25, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            padding: 20px;
         }
 
-        .loader {
-            display: none;
+        .loading-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 36px 24px;
             text-align: center;
-            margin: 24px 0;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease-out;
         }
 
-        .spinner {
+        .spinner-large {
             border: 4px solid rgba(255, 255, 255, 0.1);
-            width: 40px;
-            height: 40px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             border-left-color: var(--accent-primary);
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 12px auto;
+            border-top-color: var(--accent-police);
+            animation: spin 0.9s linear infinite;
+            margin: 0 auto 20px auto;
         }
 
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -397,15 +413,24 @@
         @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
 
         .hidden { display: none !important; }
+
+        /* OPTIMIZĂRI DISPOZITIVE MOBILE */
+        @media (max-width: 600px) {
+            body { padding: 12px; }
+            .card { padding: 18px; border-radius: 16px; }
+            header h1 { font-size: 1.4rem; }
+            .grid-buttons { grid-template-columns: 1fr; }
+            .btn { padding: 14px; font-size: 0.9rem; }
+        }
     </style>
 </head>
 <body>
 
     <!-- MODAL SALVARE NUME -->
-    <div id="nameModal" class="modal-overlay">
-        <div class="card" style="width: 90%; max-width: 400px; text-align: center;">
-            <h2 style="margin-bottom: 10px; font-size: 1.5rem;">Bine ai venit! 👋</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.88rem;">
+    <div id="nameModal" class="modal-overlay hidden">
+        <div class="card" style="width: 100%; max-width: 400px; text-align: center;">
+            <h2 style="margin-bottom: 10px; font-size: 1.4rem;">Bine ai venit! 👋</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.85rem;">
                 Introdu numele tău pentru a-ți salva parcursul și rezultatele.
             </p>
             <form id="nameForm" onsubmit="saveUserName(event)">
@@ -414,6 +439,17 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Începe Acum 🚀</button>
             </form>
+        </div>
+    </div>
+
+    <!-- OVERLAY FULLSCREEN LOADING PENTRU GENERARE TEST AI -->
+    <div id="aiLoadingOverlay" class="modal-overlay hidden">
+        <div class="loading-card">
+            <div class="spinner-large"></div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 8px;">Așteaptă puțin... ⚡</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5;">
+                Generăm testul tău în timp real cu Inteligența Artificială. Se construiesc întrebările și explicațiile...
+            </p>
         </div>
     </div>
 
@@ -434,22 +470,22 @@
         <div class="nav-tabs">
             <button class="tab-btn active" id="tabCreate" onclick="switchTab('create')">✨ Creează Test</button>
             <button class="tab-btn" id="tabQuiz" onclick="switchTab('quiz')" id="tabQuizBtn" disabled>📝 Test Curent</button>
-            <button class="tab-btn" id="tabHistory" onclick="switchTab('history')">📊 Teste Anterioare</button>
+            <button class="tab-btn" id="tabHistory" onclick="switchTab('history')">📊 Istoric Teste</button>
         </div>
 
         <!-- VEDERE: CREARE TEST -->
         <div id="viewCreate" class="card">
             
             <!-- SELECTOR CONFIGURABIL DE NUMĂR ÎNTREBĂRI -->
-            <div class="form-group" style="margin-bottom: 24px; background: rgba(0,0,0,0.1); padding: 16px; border-radius: 12px; border: 1px solid var(--card-border);">
+            <div class="form-group" style="margin-bottom: 20px; background: rgba(0,0,0,0.1); padding: 14px; border-radius: 12px; border: 1px solid var(--card-border);">
                 <label style="color: var(--accent-primary);">⚙️ Câte întrebări dorești să conțină testul?</label>
-                <input type="number" id="questionCountInput" min="1" max="100" value="5" placeholder="Introdu numărul de întrebări (ex: 3, 5, 10, 15)">
+                <input type="number" id="questionCountInput" min="1" max="100" value="5" placeholder="Introdu numărul (ex: 3, 5, 10, 15)">
             </div>
 
             <!-- SECȚIUNEA 1: ACADEMIA DE POLIȚIE (EXAMEN SCRIS) -->
-            <div style="margin-bottom: 20px;">
-                <h3 style="font-size: 1.15rem; color: var(--accent-academy); margin-bottom: 6px;">1. Academia de Poliție "Alexandru Ioan Cuza" 🎓</h3>
-                <p style="font-size: 0.88rem; color: var(--text-secondary);">Grile nivel avansat create după programa oficială de admitere.</p>
+            <div style="margin-bottom: 16px;">
+                <h3 style="font-size: 1.05rem; color: var(--accent-academy); margin-bottom: 4px;">1. Academia de Poliție "Alexandru Ioan Cuza" 🎓</h3>
+                <p style="font-size: 0.82rem; color: var(--text-secondary);">Grile nivel avansat create după programa oficială de admitere.</p>
             </div>
 
             <div class="grid-buttons">
@@ -458,22 +494,22 @@
                 <button class="btn btn-academy" onclick="generateQuiz('police_english')">🇬🇧 Limba Engleză (C1/C2)</button>
             </div>
 
-            <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 24px 0;">
+            <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 20px 0;">
 
-            <!-- SECȚIUNEA 2: TEST PSIHOLOGIC POLIȚIE (DOAR SERII NUMERICE) -->
-            <div style="margin-bottom: 20px;">
-                <h3 style="font-size: 1.15rem; color: var(--accent-police); margin-bottom: 6px;">2. Test Psihologic Poliție (Serii Numerice) 🧠</h3>
-                <p style="font-size: 0.88rem; color: var(--text-secondary);">Exclusiv șiruri și serii numerice complexe cu reguli matematice de identificat.</p>
+            <!-- SECȚIUNEA 2: TEST PSIHOLOGIC POLIȚIE (SERII NUMERICE) -->
+            <div style="margin-bottom: 16px;">
+                <h3 style="font-size: 1.05rem; color: var(--accent-police); margin-bottom: 4px;">2. Test Psihologic Poliție (Serii Numerice) 🧠</h3>
+                <p style="font-size: 0.82rem; color: var(--text-secondary);">Exclusiv șiruri și serii numerice complexe cu reguli matematice de identificat.</p>
             </div>
 
             <button class="btn btn-police" onclick="generateQuiz('psych')">Start Test Serii Numerice 🔢</button>
 
-            <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 24px 0;">
+            <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 20px 0;">
 
             <!-- SECȚIUNEA 3: TEST PERSONALIZAT AI -->
-            <div style="margin-bottom: 20px;">
-                <h3 style="font-size: 1.15rem; color: var(--accent-primary); margin-bottom: 6px;">3. Test Personalizat pe Orice Subiect 💡</h3>
-                <p style="font-size: 0.88rem; color: var(--text-secondary);">Introdu orice alt subiect dorit (ex: Codul Penal, OUG 195, Informatică).</p>
+            <div style="margin-bottom: 16px;">
+                <h3 style="font-size: 1.05rem; color: var(--accent-primary); margin-bottom: 4px;">3. Test Personalizat pe Orice Subiect 💡</h3>
+                <p style="font-size: 0.82rem; color: var(--text-secondary);">Introdu orice alt subiect dorit (ex: Codul Penal, OUG 195, Informatică).</p>
             </div>
 
             <div class="form-group">
@@ -482,11 +518,6 @@
             </div>
             
             <button class="btn btn-primary" onclick="generateQuiz('general')">Generază Test Personalizat ⚡</button>
-
-            <div id="loader" class="loader">
-                <div class="spinner"></div>
-                <p style="color: var(--text-secondary); font-size: 0.9rem;">Se generează întrebările în timp real via Groq AI...</p>
-            </div>
         </div>
 
         <!-- VEDERE: TEST CURENT -->
@@ -495,42 +526,42 @@
                 <div id="progressBar" class="progress-bar-fill"></div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 id="quizTitle" style="font-size: 1.2rem; font-weight: 700;">-</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h2 id="quizTitle" style="font-size: 1.1rem; font-weight: 700;">-</h2>
                 <span id="quizProgress" style="font-size: 0.85rem; font-weight: 700; color: var(--accent-primary);">-</span>
             </div>
 
             <div id="questionContainer">
-                <h3 id="questionText" style="margin-bottom: 24px; font-weight: 600; line-height: 1.4; font-size: 1.1rem;">-</h3>
+                <h3 id="questionText" style="margin-bottom: 20px; font-weight: 600; line-height: 1.4; font-size: 1rem;">-</h3>
                 <div id="optionsContainer"></div>
                 <div id="explanationBox" class="explanation hidden"></div>
             </div>
 
-            <div id="quizFooter" style="margin-top: 24px; text-align: right;" class="hidden">
-                <button id="btnNext" class="btn btn-primary" style="width: auto; padding: 12px 28px; display: inline-flex;" onclick="nextQuestion()">Următoarea Întrebare ➔</button>
+            <div id="quizFooter" style="margin-top: 20px; text-align: right;" class="hidden">
+                <button id="btnNext" class="btn btn-primary" style="width: 100%; max-width: 250px; margin-left: auto;" onclick="nextQuestion()">Următoarea Întrebare ➔</button>
             </div>
 
             <!-- ECRAN REZULTAT FINAL -->
-            <div id="summaryContainer" class="hidden" style="text-align: center; padding: 20px 0;">
-                <div style="font-size: 3rem; margin-bottom: 10px;">🎯</div>
-                <h2 style="font-size: 1.8rem; margin-bottom: 8px;">Test Finalizat!</h2>
-                <p style="font-size: 1rem; color: var(--text-secondary); margin-bottom: 20px;">Scorul tău obținut:</p>
+            <div id="summaryContainer" class="hidden" style="text-align: center; padding: 10px 0;">
+                <div style="font-size: 2.8rem; margin-bottom: 10px;">🎯</div>
+                <h2 style="font-size: 1.6rem; margin-bottom: 6px;">Test Finalizat!</h2>
+                <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 16px;">Scorul tău obținut:</p>
                 
-                <div style="font-size: 2.5rem; font-weight: 800; color: var(--success); margin-bottom: 20px;" id="finalScore">-</div>
+                <div style="font-size: 2.2rem; font-weight: 800; color: var(--success); margin-bottom: 16px;" id="finalScore">-</div>
 
-                <p id="emailStatus" style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 24px;">Se trimit rezultatele...</p>
+                <p id="emailStatus" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px;">Se trimit rezultatele...</p>
                 
-                <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-                    <button class="btn btn-primary" style="width: auto;" onclick="switchTab('create')">Creează alt Test</button>
-                    <button class="btn btn-police" style="width: auto;" onclick="switchTab('history')">Vezi Teste Anterioare</button>
+                <div style="display: flex; gap: 10px; justify-content: center; flex-direction: column;">
+                    <button class="btn btn-primary" onclick="switchTab('create')">Creează alt Test</button>
+                    <button class="btn btn-police" onclick="switchTab('history')">Vezi Teste Anterioare</button>
                 </div>
             </div>
         </div>
 
         <!-- VEDERE: TESTE ANTERIOARE (ISTORIC) -->
         <div id="viewHistory" class="card hidden">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                <h3 style="font-size: 1.2rem;">Istoric Teste Efectuate</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-size: 1.1rem;">Istoric Teste Efectuate</h3>
                 <button class="btn-link" style="color: var(--danger);" onclick="clearHistory()">Șterge Istoricul</button>
             </div>
 
@@ -644,8 +675,9 @@ Exemplu formulare: "Care este numărul ce urmează în seria: 2, 5, 10, 17, 26, 
                 promptText = `Creează un test grilă pe tema "${topic}" cu exact ${count} întrebări.`;
             }
 
-            const loader = document.getElementById('loader');
-            loader.style.display = 'block';
+            // Afișează modalul full-screen cu efect de încețoșare
+            const aiOverlay = document.getElementById('aiLoadingOverlay');
+            aiOverlay.classList.remove('hidden');
 
             const fullPrompt = `${promptText}
 Răspunde STRICT cu un obiect JSON valid în limba română, fără alt text:
@@ -688,7 +720,8 @@ Răspunde STRICT cu un obiect JSON valid în limba română, fără alt text:
                 console.error(err);
                 alert("Eroare la generare: " + err.message);
             } finally {
-                loader.style.display = 'none';
+                // Ascunde modalul de încărcare
+                aiOverlay.classList.add('hidden');
             }
         }
 
