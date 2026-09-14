@@ -187,7 +187,6 @@
             border: 1px solid var(--card-border);
         }
 
-        /* GRID DE BUTOANE DEDICATE ACADEMIEI */
         .grid-buttons {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -210,7 +209,7 @@
             letter-spacing: 0.5px;
         }
 
-        input[type="text"], select {
+        input[type="text"], input[type="number"], select {
             width: 100%;
             padding: 14px 18px;
             border-radius: 12px;
@@ -221,7 +220,7 @@
             outline: none;
         }
 
-        input[type="text"]:focus, select:focus {
+        input[type="text"]:focus, input[type="number"]:focus, select:focus {
             border-color: var(--accent-primary);
         }
 
@@ -441,14 +440,10 @@
         <!-- VEDERE: CREARE TEST -->
         <div id="viewCreate" class="card">
             
-            <!-- SELECTOR NUMĂR ÎNTREBĂRI PENTRU TOATE TESTELE PREDEFINITE -->
-            <div class="form-group" style="margin-bottom: 24px;">
-                <label>Număr de întrebări pentru testele rapide:</label>
-                <select id="presetCountInput">
-                    <option value="3">3 Întrebări (Rapid)</option>
-                    <option value="5" selected>5 Întrebări (Standard)</option>
-                    <option value="10">10 Întrebări (Simulare Examen)</option>
-                </select>
+            <!-- SELECTOR CONFIGURABIL DE NUMĂR ÎNTREBĂRI -->
+            <div class="form-group" style="margin-bottom: 24px; background: rgba(0,0,0,0.1); padding: 16px; border-radius: 12px; border: 1px solid var(--card-border);">
+                <label style="color: var(--accent-primary);">⚙️ Câte întrebări dorești să conțină testul?</label>
+                <input type="number" id="questionCountInput" min="1" max="20" value="5" placeholder="Introdu numărul de întrebări (ex: 3, 5, 10, 15)">
             </div>
 
             <!-- SECȚIUNEA 1: ACADEMIA DE POLIȚIE (EXAMEN SCRIS) -->
@@ -465,13 +460,13 @@
 
             <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 24px 0;">
 
-            <!-- SECȚIUNEA 2: TEST PSIHOLOGIC POLIȚIE -->
+            <!-- SECȚIUNEA 2: TEST PSIHOLOGIC POLIȚIE (DOAR SERII NUMERICE) -->
             <div style="margin-bottom: 20px;">
-                <h3 style="font-size: 1.15rem; color: var(--accent-police); margin-bottom: 6px;">2. Test Psihologic Poliție 🧠</h3>
-                <p style="font-size: 0.88rem; color: var(--text-secondary);">Serii numerice, figuri logice, raționamente deductive și analogii verbale.</p>
+                <h3 style="font-size: 1.15rem; color: var(--accent-police); margin-bottom: 6px;">2. Test Psihologic Poliție (Serii Numerice) 🧠</h3>
+                <p style="font-size: 0.88rem; color: var(--text-secondary);">Exclusiv șiruri și serii numerice complexe cu reguli matematice de identificat.</p>
             </div>
 
-            <button class="btn btn-police" onclick="generateQuiz('psych')">Start Test Psihologic 👮‍♂️</button>
+            <button class="btn btn-police" onclick="generateQuiz('psych')">Start Test Serii Numerice 🔢</button>
 
             <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 24px 0;">
 
@@ -485,14 +480,7 @@
                 <label>Subiectul dorit:</label>
                 <input type="text" id="topicInput" placeholder="Ex: Legislație Rutieră OUG 195/2002...">
             </div>
-            <div class="form-group">
-                <label>Număr de întrebări:</label>
-                <select id="countInputGeneral">
-                    <option value="3">3 Întrebări</option>
-                    <option value="5" selected>5 Întrebări</option>
-                    <option value="10">10 Întrebări</option>
-                </select>
-            </div>
+            
             <button class="btn btn-primary" onclick="generateQuiz('general')">Generază Test Personalizat ⚡</button>
 
             <div id="loader" class="loader">
@@ -554,7 +542,7 @@
     </div>
 
     <script>
-        // CONFIGURARE CHEI
+        // CONFIGURARE CHEI (CHEIA TA GROQ INTRODUSĂ AUTOMAT)
         const GROQ_API_KEY = "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"; 
         const FORMSPREE_FORM_ID = "xqpkrglg";
 
@@ -630,13 +618,19 @@
 
         async function generateQuiz(type) {
             let promptText = "";
-            let count = document.getElementById('presetCountInput').value;
+            let countInput = document.getElementById('questionCountInput').value;
+            let count = parseInt(countInput) || 5;
+
+            if (count < 1) count = 1;
+            if (count > 25) count = 25;
 
             if (type === 'psych') {
-                promptText = `Creează un test psihologic de tip "Inteligență Logică și Raționament Verbal" pentru admitere în Poliție cu exact ${count} întrebări. Include serii de numere, analogii logice și raționamente deductive.`;
+                promptText = `Creează un test psihologic format EXCLUSIV și STRICT din SERII NUMERICE (șiruri de numere) pentru admiterea în Poliție, având exact ${count} întrebări. 
+Fiecare întrebare trebuie să prezinte un șir de numere cu o regulă logică/matematică de calcul (progresii, diferențe duble, operații combinate) și să ceară identificarea numărului care urmează.
+Exemplu formulare: "Care este numărul ce urmează în seria: 2, 5, 10, 17, 26, ?". Explicația trebuie să arate pas cu pas regula de calcul a șirului.`;
             } 
             else if (type === 'police_romanian') {
-                promptText = `Creează un test grilă de Limba Română (gramatică avansată, sintaxa frazei, subordonate dificile, DOOM3, acorduri și fonetică) la nivelul de dificultate al examenului de admitere la Academia de Poliție "Alexandru Ioan Cuza", cu exact ${count} întrebări. Pone capcane de redactare la opțiunile greșite.`;
+                promptText = `Creează un test grilă de Limba Română (gramatică avansată, sintaxa frazei, subordonate dificile, DOOM3, acorduri și fonetică) la nivelul de dificultate al examenului de admitere la Academia de Poliție "Alexandru Ioan Cuza", cu exact ${count} întrebări. Pune capcane de redactare la opțiunile greșite.`;
             } 
             else if (type === 'police_history') {
                 promptText = `Creează un test grilă de Istoria Românilor la nivelul examenului de admitere la Academia de Poliție cu exact ${count} întrebări. Axează-te pe nuanțe de cronologie, denumiri exacte de tratate, constituții și proiecte politice din secolele XVIII-XX.`;
@@ -646,7 +640,6 @@
             } 
             else if (type === 'general') {
                 const topic = document.getElementById('topicInput').value.trim();
-                count = document.getElementById('countInputGeneral').value;
                 if (!topic) { alert('Te rugăm să introduci un subiect!'); return; }
                 promptText = `Creează un test grilă pe tema "${topic}" cu exact ${count} întrebări.`;
             }
