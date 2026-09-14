@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Platformă Teste AI & Matematică Logică</title>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -80,7 +79,6 @@
             font-size: 0.85rem;
         }
 
-        /* Modal / Welcome Screen */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -108,7 +106,6 @@
             text-align: center;
         }
 
-        /* Forms & Inputs */
         .form-group {
             margin-bottom: 20px;
             text-align: left;
@@ -137,7 +134,6 @@
             border-color: var(--primary);
         }
 
-        /* Buttons */
         .btn {
             width: 100%;
             padding: 14px;
@@ -172,7 +168,6 @@
             background: var(--math-hover);
         }
 
-        /* Navigation Tabs */
         .nav-tabs {
             display: flex;
             gap: 10px;
@@ -197,7 +192,6 @@
             border-color: var(--primary);
         }
 
-        /* Quiz Options & Questions */
         .option-btn {
             width: 100%;
             text-align: left;
@@ -237,7 +231,6 @@
             color: var(--text-muted);
         }
 
-        /* Loader */
         .loader {
             display: none;
             text-align: center;
@@ -264,7 +257,7 @@
 </head>
 <body>
 
-    <!-- Ecran de întâmpinare (Nume utilizator) -->
+    <!-- Ecran de întâmpinare -->
     <div id="nameModal" class="modal-overlay">
         <div class="card modal-card">
             <h2 style="margin-bottom: 15px;">Bine ai venit! 👋</h2>
@@ -297,7 +290,6 @@
 
         <!-- Tab 1: Creare Test -->
         <div id="viewCreate" class="card">
-            <!-- Opțiunea 1: Test General AI -->
             <h3 style="margin-bottom: 15px; font-size: 1.1rem; color: #818cf8;">1. Test pe orice temă (AI General)</h3>
             <div class="form-group">
                 <label>Subiectul dorit:</label>
@@ -315,7 +307,6 @@
 
             <hr style="border: 0; border-top: 1px solid var(--border); margin: 25px 0;">
 
-            <!-- Opțiunea 2: Test Matematică & Logică -->
             <h3 style="margin-bottom: 15px; font-size: 1.1rem; color: #34d399;">2. Test rapid de Matematică & Logică 🧮</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
                 Generează automat probleme de logică, serii de numere și aritmetică mentală.
@@ -365,18 +356,16 @@
     </div>
 
     <script>
-        // --- CONFIGURARE CHEI ---
+        // CONFIGURARE CHEI
         const GEMINI_API_KEY = "AQ.Ab8RN6LtX1lXDhLWj65eA_2s76rO_4ehCP5NxmYP59Q9dlg6Nw";
         const FORMSPREE_FORM_ID = "xqpkrglg";
 
-        // Stare Aplicație
         let currentUser = localStorage.getItem('user_name') || '';
         let currentQuiz = null;
         let currentQuestionIndex = 0;
         let score = 0;
         let userAnswers = [];
 
-        // --- GESTIONARE Nume Utilizator ---
         window.addEventListener('DOMContentLoaded', () => {
             if (!currentUser) {
                 openNameModal();
@@ -400,7 +389,6 @@
             }
         }
 
-        // --- GESTIONARE TAB-URI ---
         function switchTab(tab) {
             const tabCreate = document.getElementById('tabCreate');
             const tabQuiz = document.getElementById('tabQuiz');
@@ -420,7 +408,6 @@
             }
         }
 
-        // --- GENERARE TEST CU GEMINI AI ---
         async function generateQuiz(type) {
             let topic = "";
             let count = 5;
@@ -437,15 +424,18 @@
             const loader = document.getElementById('loader');
             loader.style.display = 'block';
 
-            const promptText = `Creează un test grilă în limba română pe tema "${topic}" cu exact ${count} întrebări. Oferă întrebări clare, cu 4 variante de răspuns și o explicație scurtă.`;
+            const promptText = `Creează un test grilă în limba română pe tema "${topic}" cu exact ${count} întrebări. Oferă răspunsul strict în format JSON.`;
 
             try {
-                // S-a actualizat modelul la gemini-3.6-flash
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${GEMINI_API_KEY}`;
+                // Se folosește header-ul x-goog-api-key pentru compatibilitate maximă cu noile chei
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`;
 
                 const response = await fetch(url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'x-goog-api-key': GEMINI_API_KEY
+                    },
                     body: JSON.stringify({
                         contents: [{ parts: [{ text: promptText }] }],
                         generationConfig: {
@@ -493,7 +483,6 @@
             }
         }
 
-        // --- RULARE TEST ---
         function startQuiz() {
             currentQuestionIndex = 0;
             score = 0;
@@ -565,7 +554,6 @@
             }
         }
 
-        // --- FINALIZARE & TRIMITERE FORMSPREE ---
         async function finishQuiz() {
             document.getElementById('questionContainer').classList.add('hidden');
             document.getElementById('quizFooter').classList.add('hidden');
