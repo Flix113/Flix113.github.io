@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Platformă Teste AI & Matematică Logica</title>
+    <title>Platformă Teste AI & Matematică Logică</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -281,7 +281,7 @@
     </div>
 
     <div class="container">
-        <header>
+        header>
             <h1>Quiz AI & Logică</h1>
             <div class="user-welcome">
                 <span>Utilizator: <strong id="displayName" style="color: var(--text);">-</strong></span>
@@ -366,8 +366,8 @@
 
     <script>
         // --- CONFIGURARE CHEI ---
-        const GEMINI_API_KEY = "AQ.Ab8RN6LtX1lXDhLWj65eA_2s76rO_4ehCP5NxmYP59Q9dlg6Nw"; // Introdu cheia ta Gemini generată în Google AI Studio
-        const FORMSPREE_FORM_ID = "xqpkrglg"; // ID-ul tău de Formspree
+        const GEMINI_API_KEY = "AQ.Ab8RN6LtX1lXDhLWj65eA_2s76rO_4ehCP5NxmYP59Q9dlg6Nw";
+        const FORMSPREE_FORM_ID = "xqpkrglg";
 
         // Stare Aplicație
         let currentUser = localStorage.getItem('user_name') || '';
@@ -473,7 +473,11 @@
                     })
                 });
 
-                if (!response.ok) throw new Error("A apărut o eroare la conectarea cu AI-ul.");
+                if (!response.ok) {
+                    const errData = await response.json();
+                    console.error("Eroare de la Google:", errData);
+                    throw new Error(errData.error?.message || "A apărut o eroare la conectarea cu AI-ul.");
+                }
 
                 const data = await response.json();
                 const rawText = data.candidates[0].content.parts[0].text;
@@ -482,7 +486,7 @@
                 startQuiz();
             } catch (err) {
                 console.error(err);
-                alert("Eroare la generare! Verifică dacă cheia Gemini API este adăugată corect în cod.");
+                alert("Eroare la generare: " + err.message);
             } finally {
                 loader.style.display = 'none';
             }
