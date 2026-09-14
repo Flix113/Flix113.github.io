@@ -281,7 +281,7 @@
     </div>
 
     <div class="container">
-        header>
+        <header>
             <h1>Quiz AI & Logică</h1>
             <div class="user-welcome">
                 <span>Utilizator: <strong id="displayName" style="color: var(--text);">-</strong></span>
@@ -440,7 +440,8 @@
             const promptText = `Creează un test grilă în limba română pe tema "${topic}" cu exact ${count} întrebări. Oferă întrebări clare, cu 4 variante de răspuns și o explicație scurtă.`;
 
             try {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+                // S-a actualizat modelul la gemini-3.6-flash
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${GEMINI_API_KEY}`;
 
                 const response = await fetch(url, {
                     method: 'POST',
