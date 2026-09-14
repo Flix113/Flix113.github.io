@@ -72,7 +72,7 @@
         .container {
             width: 100%;
             max-width: 850px;
-            padding-bottom: 40px; /* Asigură vizibilitatea părții de jos pe mobil */
+            padding-bottom: 40px;
         }
 
         header {
@@ -371,11 +371,11 @@
         .score-mid { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
         .score-low { background: rgba(239, 44, 44, 0.15); color: var(--danger); }
 
-        /* MODALE & AMBIEȚIÂ ÎNCEȚOȘATĂ */
+        /* MODALE & AMBIANȚĂ ÎNCEȚOȘATĂ */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(11, 15, 25, 0.75);
+            background: rgba(11, 15, 25, 0.8);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             display: flex;
@@ -426,8 +426,8 @@
 </head>
 <body>
 
-    <!-- MODAL SALVARE NUME -->
-    <div id="nameModal" class="modal-overlay hidden">
+    <!-- MODAL SALVARE NUME (Apare automat la intrarea pe site dacă nu există un nume salvat) -->
+    <div id="nameModal" class="modal-overlay">
         <div class="card" style="width: 100%; max-width: 400px; text-align: center;">
             <h2 style="margin-bottom: 10px; font-size: 1.4rem;">Bine ai venit! 👋</h2>
             <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.85rem;">
@@ -448,7 +448,7 @@
             <div class="spinner-large"></div>
             <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 8px;">Așteaptă puțin... ⚡</h3>
             <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5;">
-                Generăm testul tău în timp real cu Inteligența Artificială. Se construiesc întrebările și explicațiile...
+                Se generează testul tău în timp real cu Inteligența Artificială. Se construiesc întrebările și explicațiile...
             </p>
         </div>
     </div>
@@ -573,7 +573,6 @@
     </div>
 
     <script>
-        // CONFIGURARE CHEI (CHEIA TA GROQ INTRODUSĂ AUTOMAT)
         const GROQ_API_KEY = "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"; 
         const FORMSPREE_FORM_ID = "xqpkrglg";
 
@@ -604,6 +603,7 @@
                 openNameModal();
             } else {
                 document.getElementById('displayName').textContent = currentUser;
+                document.getElementById('nameModal').classList.add('hidden');
             }
         });
 
@@ -657,7 +657,7 @@
 
             if (type === 'psych') {
                 promptText = `Creează un test psihologic format EXCLUSIV și STRICT din SERII NUMERICE (șiruri de numere) pentru admiterea în Poliție, având exact ${count} întrebări. 
-Fiecare întrebare trebuie să prezinte un șir de numere cu o regulă logică/matematică de calcul (progresii, diferențe duble, operații combinate) și să ceară identificarea numărului care urmează.
+Fiecare întrebare trebuie să prezinte un șir de numere cu o regulă logică/matematica de calcul (progresii, diferențe duble, operații combinate) și să ceară identificarea numărului care urmează.
 Exemplu formulare: "Care este numărul ce urmează în seria: 2, 5, 10, 17, 26, ?". Explicația trebuie să arate pas cu pas regula de calcul a șirului.`;
             } 
             else if (type === 'police_romanian') {
@@ -675,7 +675,6 @@ Exemplu formulare: "Care este numărul ce urmează în seria: 2, 5, 10, 17, 26, 
                 promptText = `Creează un test grilă pe tema "${topic}" cu exact ${count} întrebări.`;
             }
 
-            // Afișează modalul full-screen cu efect de încețoșare
             const aiOverlay = document.getElementById('aiLoadingOverlay');
             aiOverlay.classList.remove('hidden');
 
@@ -720,7 +719,6 @@ Răspunde STRICT cu un obiect JSON valid în limba română, fără alt text:
                 console.error(err);
                 alert("Eroare la generare: " + err.message);
             } finally {
-                // Ascunde modalul de încărcare
                 aiOverlay.classList.add('hidden');
             }
         }
@@ -810,7 +808,6 @@ Răspunde STRICT cu un obiect JSON valid în limba română, fără alt text:
             
             document.getElementById('finalScore').textContent = `${scoreText} (${percentage}%)`;
 
-            // SALVARE ÎN ISTORIC LOCAL
             const historyItem = {
                 title: currentQuiz.title,
                 date: new Date().toLocaleDateString('ro-RO') + ' ' + new Date().toLocaleTimeString('ro-RO', {hour: '2-digit', minute:'2-digit'}),
