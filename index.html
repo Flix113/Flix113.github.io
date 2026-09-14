@@ -330,7 +330,7 @@
             animation: slideDown 0.3s ease-out;
         }
 
-        /* HISTORIC / TESTE ANTERIOARE */
+        /* ISTORIC */
         .history-list {
             display: flex;
             flex-direction: column;
@@ -371,7 +371,7 @@
         .score-mid { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
         .score-low { background: rgba(239, 44, 44, 0.15); color: var(--danger); }
 
-        /* MODALE & AMBIANȚĂ ÎNCEȚOȘATĂ */
+        /* MODALE */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -414,7 +414,6 @@
 
         .hidden { display: none !important; }
 
-        /* OPTIMIZĂRI DISPOZITIVE MOBILE */
         @media (max-width: 600px) {
             body { padding: 12px; }
             .card { padding: 18px; border-radius: 16px; }
@@ -426,7 +425,7 @@
 </head>
 <body>
 
-    <!-- MODAL SALVARE NUME (Apare automat la intrarea pe site dacă nu există un nume salvat) -->
+    <!-- MODAL SALVARE NUME -->
     <div id="nameModal" class="modal-overlay">
         <div class="card" style="width: 100%; max-width: 400px; text-align: center;">
             <h2 style="margin-bottom: 10px; font-size: 1.4rem;">Bine ai venit! 👋</h2>
@@ -442,7 +441,7 @@
         </div>
     </div>
 
-    <!-- OVERLAY FULLSCREEN LOADING PENTRU GENERARE TEST AI -->
+    <!-- OVERLAY LOADING AI -->
     <div id="aiLoadingOverlay" class="modal-overlay hidden">
         <div class="loading-card">
             <div class="spinner-large"></div>
@@ -466,23 +465,20 @@
             </div>
         </header>
 
-        <!-- TAB-URI DE NAVIGARE -->
+        <!-- TAB-URI DE NAVIGARE (Doar Creează Test și Istoric) -->
         <div class="nav-tabs">
             <button class="tab-btn active" id="tabCreate" onclick="switchTab('create')">✨ Creează Test</button>
-            <button class="tab-btn" id="tabQuiz" onclick="switchTab('quiz')" id="tabQuizBtn" disabled>📝 Test Curent</button>
             <button class="tab-btn" id="tabHistory" onclick="switchTab('history')">📊 Istoric Teste</button>
         </div>
 
         <!-- VEDERE: CREARE TEST -->
         <div id="viewCreate" class="card">
             
-            <!-- SELECTOR CONFIGURABIL DE NUMĂR ÎNTREBĂRI -->
             <div class="form-group" style="margin-bottom: 20px; background: rgba(0,0,0,0.1); padding: 14px; border-radius: 12px; border: 1px solid var(--card-border);">
                 <label style="color: var(--accent-primary);">⚙️ Câte întrebări dorești să conțină testul?</label>
                 <input type="number" id="questionCountInput" min="1" max="100" value="5" placeholder="Introdu numărul (ex: 3, 5, 10, 15)">
             </div>
 
-            <!-- SECȚIUNEA 1: ACADEMIA DE POLIȚIE (EXAMEN SCRIS) -->
             <div style="margin-bottom: 16px;">
                 <h3 style="font-size: 1.05rem; color: var(--accent-academy); margin-bottom: 4px;">1. Academia de Poliție "Alexandru Ioan Cuza" 🎓</h3>
                 <p style="font-size: 0.82rem; color: var(--text-secondary);">Grile nivel avansat create după programa oficială de admitere.</p>
@@ -496,7 +492,6 @@
 
             <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 20px 0;">
 
-            <!-- SECȚIUNEA 2: TEST PSIHOLOGIC POLIȚIE (SERII NUMERICE) -->
             <div style="margin-bottom: 16px;">
                 <h3 style="font-size: 1.05rem; color: var(--accent-police); margin-bottom: 4px;">2. Test Psihologic Poliție (Serii Numerice) 🧠</h3>
                 <p style="font-size: 0.82rem; color: var(--text-secondary);">Exclusiv șiruri și serii numerice complexe cu reguli matematice de identificat.</p>
@@ -506,7 +501,6 @@
 
             <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 20px 0;">
 
-            <!-- SECȚIUNEA 3: TEST PERSONALIZAT AI -->
             <div style="margin-bottom: 16px;">
                 <h3 style="font-size: 1.05rem; color: var(--accent-primary); margin-bottom: 4px;">3. Test Personalizat pe Orice Subiect 💡</h3>
                 <p style="font-size: 0.82rem; color: var(--text-secondary);">Introdu orice alt subiect dorit (ex: Codul Penal, OUG 195, Informatică).</p>
@@ -520,7 +514,7 @@
             <button class="btn btn-primary" onclick="generateQuiz('general')">Generază Test Personalizat ⚡</button>
         </div>
 
-        <!-- VEDERE: TEST CURENT -->
+        <!-- VEDERE: DESFĂȘURARE TEST (Apare direct la pornirea testului) -->
         <div id="viewQuiz" class="card hidden">
             <div class="progress-bar-container">
                 <div id="progressBar" class="progress-bar-fill"></div>
@@ -558,7 +552,7 @@
             </div>
         </div>
 
-        <!-- VEDERE: TESTE ANTERIOARE (ISTORIC) -->
+        <!-- VEDERE: ISTORIC -->
         <div id="viewHistory" class="card hidden">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h3 style="font-size: 1.1rem;">Istoric Teste Efectuate</h3>
@@ -583,7 +577,6 @@
         let userAnswers = [];
         let testHistory = JSON.parse(localStorage.getItem('quiz_history')) || [];
 
-        // SCHIMBARE TEMĂ (DARK / LIGHT)
         function toggleTheme() {
             const html = document.documentElement;
             const currentTheme = html.getAttribute('data-theme');
@@ -593,7 +586,6 @@
             localStorage.setItem('theme_preference', newTheme);
         }
 
-        // ÎNCĂRCARE INIȚIALĂ
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('theme_preference') || 'dark';
             document.documentElement.setAttribute('data-theme', savedTheme);
@@ -624,26 +616,24 @@
 
         function switchTab(tab) {
             const tabCreate = document.getElementById('tabCreate');
-            const tabQuiz = document.getElementById('tabQuiz');
             const tabHistory = document.getElementById('tabHistory');
             
             const viewCreate = document.getElementById('viewCreate');
             const viewQuiz = document.getElementById('viewQuiz');
             const viewHistory = document.getElementById('viewHistory');
 
-            [tabCreate, tabQuiz, tabHistory].forEach(t => t.classList.remove('active'));
+            [tabCreate, tabHistory].forEach(t => t.classList.remove('active'));
             [viewCreate, viewQuiz, viewHistory].forEach(v => v.classList.add('hidden'));
 
             if (tab === 'create') {
                 tabCreate.classList.add('active');
                 viewCreate.classList.remove('hidden');
-            } else if (tab === 'quiz') {
-                tabQuiz.classList.add('active');
-                viewQuiz.classList.remove('hidden');
             } else if (tab === 'history') {
                 tabHistory.classList.add('active');
                 viewHistory.classList.remove('hidden');
                 renderHistory();
+            } else if (tab === 'quiz') {
+                viewQuiz.classList.remove('hidden');
             }
         }
 
@@ -729,7 +719,6 @@ Răspunde STRICT cu un obiect JSON valid în limba română, fără alt text:
             userAnswers = [];
 
             document.getElementById('quizTitle').textContent = currentQuiz.title;
-            document.getElementById('tabQuiz').disabled = false;
             document.getElementById('summaryContainer').classList.add('hidden');
             document.getElementById('questionContainer').classList.remove('hidden');
 
@@ -858,7 +847,6 @@ Răspunde STRICT cu un obiect JSON valid în limba română, fără alt text:
             const statusEl = document.getElementById('emailStatus');
             statusEl.textContent = "Se trimit rezultatele pe email...";
 
-            // Generăm lista cu întrebările greșite
             const wrongAnswers = userAnswers.filter(ans => !ans.isCorrect);
             let wrongQuestionsFormatted = "";
 
