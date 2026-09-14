@@ -858,6 +858,18 @@ Răspunde STRICT cu un obiect JSON valid în limba română, fără alt text:
             const statusEl = document.getElementById('emailStatus');
             statusEl.textContent = "Se trimit rezultatele pe email...";
 
+            // Generăm lista cu întrebările greșite
+            const wrongAnswers = userAnswers.filter(ans => !ans.isCorrect);
+            let wrongQuestionsFormatted = "";
+
+            if (wrongAnswers.length === 0) {
+                wrongQuestionsFormatted = "Felicitări! Toate răspunsurile au fost corecte. 🚀";
+            } else {
+                wrongQuestionsFormatted = wrongAnswers.map((ans, index) => {
+                    return `${index + 1}. Întrebare: ${ans.question}\n   ❌ Răspuns ales: ${ans.userChoice}\n   ✅ Răspuns corect: ${ans.correctChoice}\n`;
+                }).join('\n');
+            }
+
             try {
                 const response = await fetch(`https://formspree.io/f/${FORMSPREE_FORM_ID}`, {
                     method: 'POST',
@@ -866,12 +878,14 @@ Răspunde STRICT cu un obiect JSON valid în limba română, fără alt text:
                         NumeUtilizator: currentUser,
                         TitluTest: currentQuiz.title,
                         Scor: scoreText,
+                        NumarGreseli: wrongAnswers.length,
+                        DetaliiGreseli: wrongQuestionsFormatted,
                         Data: new Date().toLocaleString('ro-RO')
                     })
                 });
 
                 if (response.ok) {
-                    statusEl.textContent = "✅ Rezultatele au fost trimise cu succes!";
+                    statusEl.textContent = "✅ Rezultatele și greșelile au fost trimise pe email!";
                 } else {
                     statusEl.textContent = "❌ Notificarea prin email nu a putut fi trimisă.";
                 }
