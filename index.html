@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Te iubesc Gabriela!!!</title>
+    <title>Platformă Pro Academia de Poliție & AI</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -16,6 +16,8 @@
             --accent-primary-hover: #4f46e5;
             --accent-police: #3b82f6;
             --accent-police-hover: #2563eb;
+            --accent-academy: #8b5cf6;
+            --accent-academy-hover: #7c3aed;
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
@@ -34,6 +36,8 @@
             --accent-primary-hover: #4338ca;
             --accent-police: #2563eb;
             --accent-police-hover: #1d4ed8;
+            --accent-academy: #7c3aed;
+            --accent-academy-hover: #6d28d9;
             --success: #059669;
             --danger: #dc2626;
             --warning: #d97706;
@@ -183,6 +187,14 @@
             border: 1px solid var(--card-border);
         }
 
+        /* GRID DE BUTOANE DEDICATE ACADEMIEI */
+        .grid-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
         /* FORMULARE & BUTOANE */
         .form-group {
             margin-bottom: 20px;
@@ -219,7 +231,7 @@
             border-radius: 12px;
             border: none;
             font-weight: 700;
-            font-size: 1rem;
+            font-size: 0.95rem;
             cursor: pointer;
             transition: all 0.25s ease;
             display: flex;
@@ -240,6 +252,11 @@
 
         .btn-police {
             background: linear-gradient(135deg, var(--accent-police), var(--accent-police-hover));
+            color: white;
+        }
+
+        .btn-academy {
+            background: linear-gradient(135deg, var(--accent-academy), var(--accent-academy-hover));
             color: white;
         }
 
@@ -423,26 +440,45 @@
 
         <!-- VEDERE: CREARE TEST -->
         <div id="viewCreate" class="card">
-            <div style="margin-bottom: 24px;">
-                <h3 style="font-size: 1.2rem; color: var(--accent-police); margin-bottom: 6px;">1. Test Psihologic Poliție (Inteligență & Raționament) 👮‍♂️</h3>
-                <p style="font-size: 0.88rem; color: var(--text-secondary);">Generare automată de serii de numere, analogii verbale și logică deductivă specifice admiterii.</p>
-            </div>
             
-            <div class="form-group">
-                <label>Număr de întrebări:</label>
-                <select id="countInputPsych">
+            <!-- SELECTOR NUMĂR ÎNTREBĂRI PENTRU TOATE TESTELE PREDEFINITE -->
+            <div class="form-group" style="margin-bottom: 24px;">
+                <label>Număr de întrebări pentru testele rapide:</label>
+                <select id="presetCountInput">
                     <option value="3">3 Întrebări (Rapid)</option>
                     <option value="5" selected>5 Întrebări (Standard)</option>
-                    <option value="10">10 Întrebări (Examen)</option>
+                    <option value="10">10 Întrebări (Simulare Examen)</option>
                 </select>
             </div>
-            <button class="btn btn-police" onclick="generateQuiz('psych')">Start Test Psihologic Poliție 🧠</button>
 
-            <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 30px 0;">
+            <!-- SECȚIUNEA 1: ACADEMIA DE POLIȚIE (EXAMEN SCRIS) -->
+            <div style="margin-bottom: 20px;">
+                <h3 style="font-size: 1.15rem; color: var(--accent-academy); margin-bottom: 6px;">1. Academia de Poliție "Alexandru Ioan Cuza" 🎓</h3>
+                <p style="font-size: 0.88rem; color: var(--text-secondary);">Grile nivel avansat create după programa oficială de admitere.</p>
+            </div>
 
-            <div style="margin-bottom: 24px;">
-                <h3 style="font-size: 1.2rem; color: var(--accent-primary); margin-bottom: 6px;">2. Test AI pe Orice Subiect 💡</h3>
-                <p style="font-size: 0.88rem; color: var(--text-secondary);">Introdu subiectul dorit (ex: Legislație Rutieră, Codul Penal, Istorie, IT).</p>
+            <div class="grid-buttons">
+                <button class="btn btn-academy" onclick="generateQuiz('police_romanian')">📖 Limba Română (Gramatică)</button>
+                <button class="btn btn-academy" onclick="generateQuiz('police_history')">📜 Istoria Românilor</button>
+                <button class="btn btn-academy" onclick="generateQuiz('police_english')">🇬🇧 Limba Engleză (C1/C2)</button>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 24px 0;">
+
+            <!-- SECȚIUNEA 2: TEST PSIHOLOGIC POLIȚIE -->
+            <div style="margin-bottom: 20px;">
+                <h3 style="font-size: 1.15rem; color: var(--accent-police); margin-bottom: 6px;">2. Test Psihologic Poliție 🧠</h3>
+                <p style="font-size: 0.88rem; color: var(--text-secondary);">Serii numerice, figuri logice, raționamente deductive și analogii verbale.</p>
+            </div>
+
+            <button class="btn btn-police" onclick="generateQuiz('psych')">Start Test Psihologic 👮‍♂️</button>
+
+            <hr style="border: 0; border-top: 1px solid var(--card-border); margin: 24px 0;">
+
+            <!-- SECȚIUNEA 3: TEST PERSONALIZAT AI -->
+            <div style="margin-bottom: 20px;">
+                <h3 style="font-size: 1.15rem; color: var(--accent-primary); margin-bottom: 6px;">3. Test Personalizat pe Orice Subiect 💡</h3>
+                <p style="font-size: 0.88rem; color: var(--text-secondary);">Introdu orice alt subiect dorit (ex: Codul Penal, OUG 195, Informatică).</p>
             </div>
 
             <div class="form-group">
@@ -496,7 +532,7 @@
 
                 <p id="emailStatus" style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 24px;">Se trimit rezultatele...</p>
                 
-                <div style="display: flex; gap: 12px; justify-content: center;">
+                <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
                     <button class="btn btn-primary" style="width: auto;" onclick="switchTab('create')">Creează alt Test</button>
                     <button class="btn btn-police" style="width: auto;" onclick="switchTab('history')">Vezi Teste Anterioare</button>
                 </div>
@@ -519,7 +555,7 @@
 
     <script>
         // CONFIGURARE CHEI
-        const GROQ_API_KEY = "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"; 
+        const GROQ_API_KEY = "gsk_PUNE_CHEIA_TA_AICI"; 
         const FORMSPREE_FORM_ID = "xqpkrglg";
 
         let currentUser = localStorage.getItem('user_name') || '';
@@ -594,15 +630,21 @@
 
         async function generateQuiz(type) {
             let promptText = "";
-            let count = 5;
+            let count = document.getElementById('presetCountInput').value;
 
             if (type === 'psych') {
-                count = document.getElementById('countInputPsych').value;
-                promptText = `Creează un test psihologic de tip "Inteligență Logică și Raționament Verbal" pentru admitere în Poliție cu exact ${count} întrebări.
-Întrebările trebuie să fie strict de tipul:
-1. "Inteligență Logică": Serii de numere de completat (Ex: "Ce număr urmează în șirul: 3, 8, 15, 24, 35, ?").
-2. "Raționament Verbal": Completări logice de propoziții și analogii (Ex: "Soarele este pentru zi așa cum Luna este pentru...").`;
-            } else if (type === 'general') {
+                promptText = `Creează un test psihologic de tip "Inteligență Logică și Raționament Verbal" pentru admitere în Poliție cu exact ${count} întrebări. Include serii de numere, analogii logice și raționamente deductive.`;
+            } 
+            else if (type === 'police_romanian') {
+                promptText = `Creează un test grilă de Limba Română (gramatică avansată, sintaxa frazei, subordonate dificile, DOOM3, acorduri și fonetică) la nivelul de dificultate al examenului de admitere la Academia de Poliție "Alexandru Ioan Cuza", cu exact ${count} întrebări. Pone capcane de redactare la opțiunile greșite.`;
+            } 
+            else if (type === 'police_history') {
+                promptText = `Creează un test grilă de Istoria Românilor la nivelul examenului de admitere la Academia de Poliție cu exact ${count} întrebări. Axează-te pe nuanțe de cronologie, denumiri exacte de tratate, constituții și proiecte politice din secolele XVIII-XX.`;
+            } 
+            else if (type === 'police_english') {
+                promptText = `Creează un test grilă de Limba Engleză de nivel avansat (C1/C2 - Inversion, Mixed Conditionals, Subjunctive, Phrasal Verbs) pentru admiterea la Academia de Poliție, cu exact ${count} întrebări. Explică regula gramaticală în limba română.`;
+            } 
+            else if (type === 'general') {
                 const topic = document.getElementById('topicInput').value.trim();
                 count = document.getElementById('countInputGeneral').value;
                 if (!topic) { alert('Te rugăm să introduci un subiect!'); return; }
