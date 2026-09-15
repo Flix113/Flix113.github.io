@@ -1,249 +1,424 @@
 // ==========================================
-// 1. KNOWLEDGE BASE (Baza de cunoștințe etalon)[cite: 1]
+// CONFIGURARE API & FORMULARE
+// ==========================================
+const GROQ_API_KEY = "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"; 
+const FORMSPREE_FORM_ID = "xqpkrglg";
+
+// Ordine optimizată strict pe modelele disponibile în contul tău
+const MODELS = [
+  "openai/gpt-oss-120b", // Principala opțiune (cea mai deșteaptă)
+  "qwen/qwen3.8-27b",    // Prima rezervă (foarte bun pe JSON și logică)
+  "openai/gpt-oss-20b"   // A doua rezervă (viteză maximă)
+];
+
+// Starea aplicației
+let currentUser = localStorage.getItem('user_name') || '';
+let currentQuiz = null;
+let currentQuestionIndex = 0;
+let score = 0;
+let userAnswers = [];
+let testHistory = JSON.parse(localStorage.getItem('quiz_history')) || [];
+
+// ==========================================
+// BAZĂ DE CUNOȘTINȚE (FEW-SHOT EXAMPLES)
 // ==========================================
 const KNOWLEDGE_BASE = {
-  romana: [
-    {
-      intrebare: "În fraza: 'E de mirare cum de a rezistat să stea până la această oră.', prima subordonată este:",
-      optiuni: ["a) completivă directă", "b) subiectivă", "c) circumstanțială de mod", "d) predicativă"],
-      raspuns_corect: "b",
-      explicatie: "Regentul este expresia impersonală 'E de mirare', care cere o propoziție subiectivă ('cum de a rezistat')."
-    },
-    {
-      intrebare: "Selectează varianta în care toate cuvintele conțin doar relații de paronimie:",
-      optiuni: [
-        "a) familial / familiar, eminent / iminent, literal / literar",
-        "b) abilitate / agilitate, oral / orar, nervos / calm",
-        "c) arbitral / arbitrar, emigrație / imigrație, vibra / răsuna",
-        "d) apropiere / apropriere, barem / barem, deferență / diferență"
-      ],
-      raspuns_corect: "a",
-      explicatie: "Toate perechile din opțiunea 'a' sunt paronime. În 'b' avem antonime (nervos/calm), iar în 'c' sinonime (vibra/răsuna)."
-    }
-  ],
-  istorie: [
-    {
-      intrebare: "Analizați următoarele enunțuri:\n(1) Proiectul 'Constituției Cărvunarilor' promova principiul separării puterilor în stat.\n(2) Mișcarea condusă de Tudor Vladimirescu a impus restabilirea domniilor pământene.",
-      optiuni: [
-        "a) Ambele afirmații sunt adevărate și există relație de cauzalitate între ele.",
-        "b) Ambele afirmații sunt adevărate, dar FĂRĂ relație de cauzalitate.",
-        "c) Prima afirmație este adevărată, iar a doua este falsă.",
-        "d) Prima afirmație este falsă, iar a doua este adevărată."
-      ],
-      raspuns_corect: "b",
-      explicatie: "Ambele afirmații sunt fapte istorice reale și corecte, dar Proiectul Cărvunarilor (1822) nu este cauza directă a restabilirii domniilor pământene rezultate în urma mișcării din 1821."
-    }
-  ]
+    romanian: `
+EXEMPLE ETALON (Acuratețe 100%):
+1. Întrebare: În propoziția "A ajuns ce se temea că va ajunge", ce funcție sintactică are subordonata?
+   Opțiuni: ["A) Subiectivă", "B) Nume predicativ", "C) Completivă directă", "D) Predicativă"]
+   Corect: 3 (D - Predicativă)
+   Explicație: Verbul "a ajuns" este copulativ și are nevoie de un nume predicativ, rol preluat de întreaga propoziție subordonată predicativă.
+
+2. Întrebare: Care este forma corectă de plural conform DOOM3?
+   Opțiuni: ["A) Niveluri / Nivele", "B) Vișine", "C) Plaje / Plăji", "D) Managere"]
+   Corect: 0 (A)
+   Explicație: Conform DOOM3, pentru termenul "nivel" sunt acceptate ambele forme de plural în funcție de sens.`,
+
+    history: `
+EXEMPLE ETALON (Acuratețe 100%):
+1. Întrebare: În ce an a fost promulgată Constituția prin care s-a introdus votul universal pentru bărbați în România?
+   Opțiuni: ["A) 1866", "B) 1923", "C) 1938", "D) 1965"]
+   Corect: 1 (B - 1923)
+   Explicație: Constituția din 1923 a consacrat votul universal, egal, direct, secret și obligatoriu pentru bărbații de peste 21 de ani.`,
+
+    english: `
+EXEMPLE ETALON (Acuratețe 100%):
+1. Întrebare: Completează spațiul liber: "Hardly ______ the station when the train left."
+   Opțiuni: ["A) I had reached", "B) had I reached", "C) reached I", "D) I reached"]
+   Corect: 1 (B)
+   Explicație: Propozițiile care încep cu adverbe negative/restrictive precum "Hardly" necesită inversiunea subiectului cu verbul auxiliar (Inversion).`,
+
+    psych: `
+EXEMPLE ETALON (Acuratețe 100%):
+1. Întrebare: Care este numărul ce urmează în seria: 2, 5, 10, 17, 26, ?
+   Opțiuni: ["A) 35", "B) 37", "C) 36", "D) 40"]
+   Corect: 1 (B - 37)
+   Explicație: Diferențele dintre numere cresc cu 2 la fiecare pas (+3, +5, +7, +9, deci urmează +11. 26 + 11 = 37).`
 };
 
 // ==========================================
-// 2. CONSTRUCTORUL DE PROMPT FEW-SHOT[cite: 1]
+// GESTIONARE TEMA & UTILIZATOR
 // ==========================================
-function buildFewShotPrompt(materia, capitol, numarIntrebari = 5) {
-  // Preluăm exemplele specifice din Knowledge Base[cite: 1]
-  const exemple = KNOWLEDGE_BASE[materia] || KNOWLEDGE_BASE.romana;
-  
-  const exempleFormatted = exemple.map((ex, idx) => `
-Exemplul ${idx + 1}:
-Întrebare: ${ex.intrebare}
-Opțiuni:
-${ex.optiuni.join("\n")}
-Răspuns corect: ${ex.raspuns_corect}
-Explicație: ${ex.explicatie}
-`).join("\n---\n");
+function toggleTheme() {
+    const html = document.documentElement;
+    const currentTheme = html.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', newTheme);
+    document.querySelector('.theme-toggle').textContent = newTheme === 'dark' ? '🌙' : '☀️';
+    localStorage.setItem('theme_preference', newTheme);
+}
 
-  return `Ești un profesor expert și membru în comisia de elaborare a subiectelor pentru examenul de admitere la Academia de Poliție „Alexandru Ioan Cuza”.
+window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme_preference') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    const toggleBtn = document.querySelector('.theme-toggle');
+    if(toggleBtn) toggleBtn.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
 
-Misiunea ta este să generezi grile de nivel AVANSAT (dificultate maximă), cu capcane gramaticale sau istorice specifice rigori examenului de admitere.
+    if (!currentUser) {
+        openNameModal();
+    } else {
+        const nameEl = document.getElementById('displayName');
+        if(nameEl) nameEl.textContent = currentUser;
+        const modal = document.getElementById('nameModal');
+        if(modal) modal.classList.add('hidden');
+    }
+});
 
-STRUCTURĂ ȘI EXEMPLE ETALON DUPĂ CARE TREBUIE SĂ TE GHIDEZI STRICT:
-${exempleFormatted}
+function openNameModal() {
+    document.getElementById('nameModal').classList.remove('hidden');
+}
 
-INSTRUCTIUNI DE GENERARE:
-1. Materia solicitată: "${materia.toUpperCase()}"
-2. Capitolul/Tema: "${capitol}"
-3. Generează EXACT ${numarIntrebari} grile noi, distincte de cele din exemple, dar identice ca stil, dificultate și capcane.
-4. Răspunde EXCLUSIV în format JSON valid, fără text introductiv sau explicații în afara structurii JSON.
+function saveUserName(e) {
+    e.preventDefault();
+    const name = document.getElementById('userNameInput').value.trim();
+    if (name) {
+        currentUser = name;
+        localStorage.setItem('user_name', name);
+        document.getElementById('displayName').textContent = name;
+        document.getElementById('nameModal').classList.add('hidden');
+    }
+}
 
-FORMATUL JSON OBLIGATORIU:
+function switchTab(tab) {
+    const tabCreate = document.getElementById('tabCreate');
+    const tabHistory = document.getElementById('tabHistory');
+    
+    const viewCreate = document.getElementById('viewCreate');
+    const viewQuiz = document.getElementById('viewQuiz');
+    const viewHistory = document.getElementById('viewHistory');
+
+    [tabCreate, tabHistory].forEach(t => t && t.classList.remove('active'));
+    [viewCreate, viewQuiz, viewHistory].forEach(v => v && v.classList.add('hidden'));
+
+    if (tab === 'create') {
+        if(tabCreate) tabCreate.classList.add('active');
+        if(viewCreate) viewCreate.classList.remove('hidden');
+    } else if (tab === 'history') {
+        if(tabHistory) tabHistory.classList.add('active');
+        if(viewHistory) viewHistory.classList.remove('hidden');
+        renderHistory();
+    } else if (tab === 'quiz') {
+        if(viewQuiz) viewQuiz.classList.remove('hidden');
+    }
+}
+
+// ==========================================
+// GENERARE TEST PRIN GROQ API (AVANSAT + FALLBACK)
+// ==========================================
+async function generateQuiz(type) {
+    let countInput = document.getElementById('questionCountInput').value;
+    let count = parseInt(countInput) || 5;
+    if (count < 1) count = 1;
+    if (count > 25) count = 25;
+
+    let instructions = "";
+    let baseContext = "";
+
+    if (type === 'psych') {
+        instructions = `Creează un test psihologic format EXCLUSIV și STRICT din SERII NUMERICE pentru admitere Poliție. Fiecare întrebare trebuie să ceară identificarea numărului ce urmează. Explicația trebuie să detalieze regula pas cu pas.`;
+        baseContext = KNOWLEDGE_BASE.psych;
+    } else if (type === 'police_romanian') {
+        instructions = `Creează un test grilă de Limba Română (gramatică avansată, sintaxă, DOOM3) la nivelul Academiei de Poliție. Pune capcane de redactare la opțiunile greșite.`;
+        baseContext = KNOWLEDGE_BASE.romanian;
+    } else if (type === 'police_history') {
+        instructions = `Creează un test grilă de Istoria Românilor la nivelul Academiei de Poliție. Axează-te pe cronologie fină, tratate și constituții din sec XVIII-XX.`;
+        baseContext = KNOWLEDGE_BASE.history;
+    } else if (type === 'police_english') {
+        instructions = `Creează un test grilă de Limba Engleză avansată (C1/C2 - Inversion, Conditionals, Subjunctive, Phrasal Verbs) pentru admitere Poliție. Explicația trebuie furnizată în limba română.`;
+        baseContext = KNOWLEDGE_BASE.english;
+    } else if (type === 'general') {
+        const topic = document.getElementById('topicInput').value.trim();
+        if (!topic) { alert('Te rugăm să introduci un subiect!'); return; }
+        instructions = `Creează un test grilă pe tema "${topic}".`;
+    }
+
+    const aiOverlay = document.getElementById('aiLoadingOverlay');
+    aiOverlay.classList.remove('hidden');
+
+    const fullPrompt = `Ești un profesor universitar expert în grilajele de admitere.
+Sarcina ta: Generează exact ${count} întrebări la nivel avansat.
+
+${baseContext ? "Baza de cunoștințe și modele de referință:\n" + baseContext : ""}
+
+Cerințe stricte:
+1. Fiecare întrebare trebuie să aibă 4 opțiuni de răspuns.
+2. Câmpul 'correct' reprezintă indexul de la 0 la 3 al răspunsului corect.
+3. Cerințe specifice: ${instructions}
+
+Răspunde STRICT cu un obiect JSON valid în limba română (fără text adițional Markdown):
 {
-  "quiz": [
+  "title": "Test Grilă - Nivel Admitere",
+  "questions": [
     {
-      "id": 1,
-      "intrebare": "Textul întrebării...",
-      "optiuni": ["a) ...", "b) ...", "c) ...", "d) ..."],
-      "raspuns_corect": "a",
-      "explicatie": "Explicație detaliată și argumentată..."
+      "q": "Formularea întrebării",
+      "opts": ["A) ...", "B) ...", "C) ...", "D) ..."],
+      "correct": 0,
+      "explanation": "Explicație clară și detaliată"
     }
   ]
 }`;
-}
 
-// ==========================================
-// 3. APELUL API CU MODELELE DISPONIBILE[cite: 1]
-// ==========================================
-async function generatePoliceAcademyQuiz(materia, capitol, apiKey) {
-  const fullPrompt = buildFewShotPrompt(materia, capitol);
-  
-  // Lista modelelor active din contul tău[cite: 1]
-  const models = [
-    "openai/gpt-oss-120b", // Prima opțiune: Cel mai inteligent model LLM (120B)[cite: 1]
-    "qwen/qwen3.8-27b",    // A doua opțiune: Excelent pe formatare JSON și logică[cite: 1]
-    "openai/gpt-oss-20b"   // A treia opțiune: Viteză maximă de rezervă[cite: 1]
-  ];
+    const loaderStart = performance.now();
+    const loaderSteps = document.querySelectorAll('.loading-step');
+    let loaderStepIndex = 0;
+    const loaderInterval = setInterval(() => {
+        loaderSteps.forEach((step, i) => step.classList.toggle('active', i === loaderStepIndex));
+        loaderStepIndex = (loaderStepIndex + 1) % loaderSteps.length;
+    }, 900);
 
-  for (const model of models) {
-    try {
-      console.log(`[Groq API] Se încearcă generarea cu modelul: ${model}...`);
+    let generatedContent = null;
+    let lastError = null;
 
-      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: model,
-          response_format: { type: "json_object" },
-          messages: [
-            {
-              role: "system",
-              content: "Ești un generator automat de teste grilă în format JSON pentru Academia de Poliție."
-            },
-            {
-              role: "user",
-              content: fullPrompt
+    // Încearcă fiecare model în ordine până când unul funcționează
+    for (const modelName of MODELS) {
+        try {
+            console.log(`Se încearcă generarea cu modelul: ${modelName}`);
+            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${GROQ_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: modelName,
+                    response_format: { type: "json_object" },
+                    messages: [{ role: "user", content: fullPrompt }]
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                generatedContent = data.choices[0].message.content;
+                console.log(`Succes folosind modelul: ${modelName}`);
+                break; // Ieși din buclă dacă a funcționat
+            } else {
+                const errData = await response.json();
+                lastError = errData.error?.message || `Eroare HTTP ${response.status}`;
+                console.warn(`Modelul ${modelName} a eșuat. Se încearcă următorul...`, lastError);
             }
-          ],
-          temperature: 0.3
-        })
-      });
-
-      if (!response.ok) {
-        const errData = await response.json();
-        console.warn(`[Groq API] Modelul ${model} a eșuat (Status: ${response.status}). Se încearcă următorul model...`, errData);
-        continue;
-      }
-
-      const data = await response.json();
-      const rawContent = data.choices[0].message.content;
-      
-      const parsedQuiz = JSON.parse(rawContent);
-      
-      console.log(`[Groq API] Test generat cu succes folosind modelul: ${model}`);
-      return parsedQuiz.quiz;
-
-    } catch (err) {
-      console.error(`[Groq API] Eroare la procesarea cu modelul ${model}:`, err);
+        } catch (err) {
+            lastError = err.message;
+            console.warn(`Eroare de rețea cu modelul ${modelName}:`, err);
+        }
     }
-  }
 
-  throw new Error("Nu s-a putut genera testul. Toate modelele au depășit limita temporară sau cheia API este invalidă.");
+    try {
+        if (!generatedContent) {
+            throw new Error(lastError || "Toate modelele specificate au eșuat.");
+        }
+
+        currentQuiz = JSON.parse(generatedContent);
+        startQuiz();
+    } catch (err) {
+        console.error(err);
+        alert("Eroare la generarea testului: " + err.message);
+    } finally {
+        clearInterval(loaderInterval);
+        const elapsed = performance.now() - loaderStart;
+        const minimumDisplay = 2000;
+        if (elapsed < minimumDisplay) {
+            await new Promise(resolve => setTimeout(resolve, minimumDisplay - elapsed));
+        }
+        aiOverlay.classList.add('hidden');
+    }
 }
 
 // ==========================================
-// 4. INTEGRATORUL PENTRU BUTONUL DIN UI
+// RULARE & INTERACȚIUNE TEST
 // ==========================================
-async function handleGenerateButtonClick() {
-  // Cheia ta API Groq inserată direct
-  const GROQ_API_KEY = "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";
-  
-  // Preluăm valorile selectate de utilizator în HTML (sau valori implicite dacă lipsesc elementele)
-  const materiaElement = document.getElementById('selectMateria');
-  const capitolElement = document.getElementById('inputCapitol');
-  
-  const materia = materiaElement ? materiaElement.value : "romana";
-  const capitol = capitolElement && capitolElement.value ? capitolElement.value : "Morfosintaxă - Excepții subordonate și acorduri";
+function startQuiz() {
+    currentQuestionIndex = 0;
+    score = 0;
+    userAnswers = [];
 
-  const btnGenerate = document.getElementById('btnGenerate');
-  if (btnGenerate) btnGenerate.disabled = true;
+    document.getElementById('quizTitle').textContent = currentQuiz.title;
+    document.getElementById('summaryContainer').classList.add('hidden');
+    document.getElementById('questionContainer').classList.remove('hidden');
 
-  try {
-    console.log("Se inițiază generarea testului...");
-    
-    const questions = await generatePoliceAcademyQuiz(materia, capitol, GROQ_API_KEY);
-    
-    // Randăm grilele pe ecran
-    renderQuizOnUI(questions);
-
-  } catch (error) {
-    alert("Eroare la generare: " + error.message);
-  } finally {
-    if (btnGenerate) btnGenerate.disabled = false;
-  }
+    switchTab('quiz');
+    showQuestion();
 }
 
-// ==========================================
-// 5. AFISAREA INTERACTIVĂ A GRILELOR
-// ==========================================
-function renderQuizOnUI(questions) {
-  const container = document.getElementById('quizContainer');
-  if (!container) {
-    console.log("Grile generat cu succes:", questions);
-    return;
-  }
-
-  container.innerHTML = ''; // Curățăm ecranul anterior
-
-  questions.forEach((q, index) => {
-    const card = document.createElement('div');
-    card.className = 'card my-3 p-3 shadow-sm';
+function showQuestion() {
+    const q = currentQuiz.questions[currentQuestionIndex];
+    const total = currentQuiz.questions.length;
     
-    let optionsHTML = '';
-    q.optiuni.forEach((opt) => {
-      // Preluăm litera opțiunii ('a', 'b', 'c', 'd')
-      const letter = opt.trim().charAt(0).toLowerCase();
-      
-      optionsHTML += `
-        <button class="btn btn-outline-primary text-start my-1 w-100 option-btn" 
-                onclick="checkAnswer(this, '${letter}', '${q.raspuns_corect}', 'expl-${index}')">
-          ${opt}
-        </button>
-      `;
+    document.getElementById('quizProgress').textContent = `${currentQuestionIndex + 1} / ${total}`;
+    document.getElementById('progressBar').style.width = `${((currentQuestionIndex + 1) / total) * 100}%`;
+    document.getElementById('questionText').textContent = q.q;
+
+    const optionsContainer = document.getElementById('optionsContainer');
+    optionsContainer.innerHTML = '';
+    document.getElementById('explanationBox').classList.add('hidden');
+    document.getElementById('quizFooter').classList.add('hidden');
+
+    q.opts.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerHTML = `<span>${opt}</span>`;
+        btn.onclick = () => selectOption(idx, btn);
+        optionsContainer.appendChild(btn);
+    });
+}
+
+function selectOption(selectedIndex, selectedBtn) {
+    const q = currentQuiz.questions[currentQuestionIndex];
+    const allBtns = document.querySelectorAll('.option-btn');
+    
+    allBtns.forEach(btn => btn.disabled = true);
+
+    const isCorrect = selectedIndex === q.correct;
+    if (isCorrect) {
+        selectedBtn.classList.add('correct');
+        score++;
+    } else {
+        selectedBtn.classList.add('wrong');
+        if (allBtns[q.correct]) {
+            allBtns[q.correct].classList.add('correct');
+        }
+    }
+
+    userAnswers.push({
+        question: q.q,
+        userChoice: q.opts[selectedIndex],
+        correctChoice: q.opts[q.correct],
+        isCorrect: isCorrect
     });
 
-    card.innerHTML = `
-      <h5><strong>${index + 1}.</strong> ${q.intrebare}</h5>
-      <div class="options-group mt-2">
-        ${optionsHTML}
-      </div>
-      <div id="expl-${index}" class="alert mt-3 d-none">
-        <strong>Explicație:</strong> ${q.explicatie}
-      </div>
-    `;
+    const expBox = document.getElementById('explanationBox');
+    expBox.innerHTML = "<strong>💡 Explicație:</strong> " + q.explanation;
+    expBox.classList.remove('hidden');
 
-    container.appendChild(card);
-  });
+    document.getElementById('quizFooter').classList.remove('hidden');
 }
 
-// Funcție pentru verificarea instantanee a opțiunii apăsate
-function checkAnswer(button, selected, correct, explId) {
-  const parent = button.parentElement;
-  const buttons = parent.querySelectorAll('.option-btn');
-  const explDiv = document.getElementById(explId);
+function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < currentQuiz.questions.length) {
+        showQuestion();
+    } else {
+        finishQuiz();
+    }
+}
 
-  // Dezactivăm toate butoanele acestei întrebări după selectare
-  buttons.forEach(btn => btn.disabled = true);
+// ==========================================
+// FINALIZARE TEST & FORMSPREE
+// ==========================================
+async function finishQuiz() {
+    document.getElementById('questionContainer').classList.add('hidden');
+    document.getElementById('quizFooter').classList.add('hidden');
+    document.getElementById('summaryContainer').classList.remove('hidden');
 
-  if (selected === correct) {
-    button.classList.remove('btn-outline-primary');
-    button.classList.add('btn-success');
-    explDiv.classList.add('alert-success');
-  } else {
-    button.classList.remove('btn-outline-primary');
-    button.classList.add('btn-danger');
-    explDiv.classList.add('alert-warning');
+    const total = currentQuiz.questions.length;
+    const scoreText = `${score} / ${total}`;
+    const percentage = Math.round((score / total) * 100);
     
-    // Arătăm și opțiunea corectă
-    buttons.forEach(btn => {
-      const btnLetter = btn.innerText.trim().charAt(0).toLowerCase();
-      if (btnLetter === correct) {
-        btn.classList.remove('btn-outline-primary');
-        btn.classList.add('btn-success');
-      }
-    });
-  }
+    document.getElementById('finalScore').textContent = `${scoreText} (${percentage}%)`;
 
-  // Afișăm explicația
-  explDiv.classList.remove('d-none');
+    const historyItem = {
+        title: currentQuiz.title,
+        date: new Date().toLocaleDateString('ro-RO') + ' ' + new Date().toLocaleTimeString('ro-RO', {hour: '2-digit', minute:'2-digit'}),
+        score: scoreText,
+        percentage: percentage
+    };
+    testHistory.unshift(historyItem);
+    localStorage.setItem('quiz_history', JSON.stringify(testHistory));
+
+    sendResultsToFormspree(scoreText);
+}
+
+function renderHistory() {
+    const container = document.getElementById('historyListContainer');
+    if (!container) return;
+
+    if (testHistory.length === 0) {
+        container.innerHTML = `<p style="color: var(--text-secondary); text-align: center; padding: 20px;">Nu ai efectuat niciun test până acum.</p>`;
+        return;
+    }
+
+    container.innerHTML = testHistory.map(item => {
+        let badgeClass = 'score-high';
+        if (item.percentage < 50) badgeClass = 'score-low';
+        else if (item.percentage < 80) badgeClass = 'score-mid';
+
+        return `
+            <div class="history-card">
+                <div class="history-info">
+                    <h4>${item.title}</h4>
+                    <p>📅 ${item.date}</p>
+                </div>
+                <div class="score-badge ${badgeClass}">
+                    ${item.score} (${item.percentage}%)
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function clearHistory() {
+    if (confirm("Sigur dorești să ștergi tot istoricul testelor?")) {
+        testHistory = [];
+        localStorage.removeItem('quiz_history');
+        renderHistory();
+    }
+}
+
+async function sendResultsToFormspree(scoreText) {
+    const statusEl = document.getElementById('emailStatus');
+    if (statusEl) statusEl.textContent = "Se trimit rezultatele pe email...";
+
+    const wrongAnswers = userAnswers.filter(ans => !ans.isCorrect);
+    let wrongQuestionsFormatted = "";
+
+    if (wrongAnswers.length === 0) {
+        wrongQuestionsFormatted = "Felicitări! Toate răspunsurile au fost corecte. 🚀";
+    } else {
+        wrongQuestionsFormatted = wrongAnswers.map((ans, index) => {
+            return `${index + 1}. Întrebare: ${ans.question}\n   ❌ Răspuns ales: ${ans.userChoice}\n   ✅ Răspuns corect: ${ans.correctChoice}\n`;
+        }).join('\n');
+    }
+
+    try {
+        const response = await fetch(`https://formspree.io/f/${FORMSPREE_FORM_ID}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                NumeUtilizator: currentUser,
+                TitluTest: currentQuiz.title,
+                Scor: scoreText,
+                NumarGreseli: wrongAnswers.length,
+                DetaliiGreseli: wrongQuestionsFormatted,
+                Data: new Date().toLocaleString('ro-RO')
+            })
+        });
+
+        if (response.ok) {
+            if (statusEl) statusEl.textContent = "✅ Rezultatele și greșelile au fost trimise pe email!";
+        } else {
+            if (statusEl) statusEl.textContent = "❌ Notificarea prin email nu a putut fi trimisă.";
+        }
+    } catch (err) {
+        if (statusEl) statusEl.textContent = "❌ Eroare de conexiune la trimitere.";
+    }
 }
