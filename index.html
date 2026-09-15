@@ -669,7 +669,7 @@ Răspunde STRICT cu un obiect JSON valid în limba română, fără alt text:
                         'Authorization': `Bearer ${GROQ_API_KEY}`
                     },
                     body: JSON.stringify({
-                        model: "llama3-8b-8192",
+                        model: "openai/gpt-oss-20b",
                         response_format: { type: "json_object" },
                         messages: [{ role: "user", content: fullPrompt }]
                     })
