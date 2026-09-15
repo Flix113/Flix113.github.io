@@ -95,7 +95,8 @@ function saveUserName(e) {
     if (name) {
         currentUser = name;
         localStorage.setItem('user_name', name);
-        document.getElementById('displayName').textContent = name;
+        const nameEl = document.getElementById('displayName');
+        if(nameEl) nameEl.textContent = name;
         document.getElementById('nameModal').classList.add('hidden');
     }
 }
@@ -124,7 +125,7 @@ function switchTab(tab) {
 }
 
 // ==========================================
-// GENERARE TEST PRIN GROQ API (AVANSAT + FALLBACK)
+// GENERARE TEST PRIN GROQ API (FALLBACK PE LISTA DE MODELE)
 // ==========================================
 async function generateQuiz(type) {
     let countInput = document.getElementById('questionCountInput').value;
@@ -190,7 +191,7 @@ Răspunde STRICT cu un obiect JSON valid în limba română (fără text adițio
     let generatedContent = null;
     let lastError = null;
 
-    // Încearcă fiecare model în ordine până când unul funcționează
+    // Încearcă fiecare model din lista MODELS până când unul răspunde cu succes
     for (const modelName of MODELS) {
         try {
             console.log(`Se încearcă generarea cu modelul: ${modelName}`);
@@ -211,11 +212,11 @@ Răspunde STRICT cu un obiect JSON valid în limba română (fără text adițio
                 const data = await response.json();
                 generatedContent = data.choices[0].message.content;
                 console.log(`Succes folosind modelul: ${modelName}`);
-                break; // Ieși din buclă dacă a funcționat
+                break;
             } else {
                 const errData = await response.json();
                 lastError = errData.error?.message || `Eroare HTTP ${response.status}`;
-                console.warn(`Modelul ${modelName} a eșuat. Se încearcă următorul...`, lastError);
+                console.warn(`Modelul ${modelName} a eșuat. Se trece la următorul...`, lastError);
             }
         } catch (err) {
             lastError = err.message;
@@ -225,7 +226,7 @@ Răspunde STRICT cu un obiect JSON valid în limba română (fără text adițio
 
     try {
         if (!generatedContent) {
-            throw new Error(lastError || "Toate modelele specificate au eșuat.");
+            throw new Error(lastError || "Toate modelele din listă au eșuat.");
         }
 
         currentQuiz = JSON.parse(generatedContent);
@@ -323,7 +324,7 @@ function nextQuestion() {
 }
 
 // ==========================================
-// FINALIZARE TEST & FORMSPREE
+// FINALIZARE TEST & TRIMITERE EMAIL
 // ==========================================
 async function finishQuiz() {
     document.getElementById('questionContainer').classList.add('hidden');
