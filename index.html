@@ -11,14 +11,18 @@
 </head>
 <body>
 
+  <!-- EFECTE AMBIENTALE FUNDAL -->
+  <div class="bg-glow-1"></div>
+  <div class="bg-glow-2"></div>
+
   <!-- MODAL BINE AI VENIT -->
   <div id="nameModal" class="modal-overlay">
     <div class="modal-card">
       <div class="brand-mark" style="margin:0 auto 16px;">✦</div>
       <h2>Bine ai venit! 👋</h2>
-      <p>Introdu numele tău pentru a-ți salva parcursul și rezultatele.</p>
-      <form id="nameForm" onsubmit="saveUserName(event)">
-        <div class="form-group">
+      <p style="color:var(--muted); margin-top:8px;">Introdu numele tău pentru a-ți salva parcursul și rezultatele.</p>
+      <form id="nameForm" onsubmit="saveUserName(event)" style="margin-top:20px;">
+        <div class="form-group" style="margin-bottom:16px;">
           <input type="text" id="userNameInput" placeholder="Ex: Popescu Alexandru" required>
         </div>
         <button type="submit" class="btn btn-primary">Începe acum <span>→</span></button>
@@ -36,10 +40,10 @@
       </div>
       <div class="generation-status">
         <span class="status-dot"></span>
-        <span>Se generează testul</span>
+        <span style="font-weight:600;">Se generează testul...</span>
       </div>
-      <h3 class="loading-title">Se pregătește sesiunea...</h3>
-      <p class="loading-text">Sunt construite întrebările, variantele de răspuns și explicațiile.</p>
+      <h3 class="loading-title" style="margin-top:10px;">Se pregătește sesiunea AI</h3>
+      <p class="loading-text" style="font-size:0.85rem; color:var(--muted); margin-top:6px;">Construim întrebările, opțiunile de răspuns și explicațiile detaliate.</p>
       <div class="loading-progress"><span></span></div>
       <div class="loading-steps">
         <span class="loading-step active">Întrebări</span>
@@ -70,7 +74,7 @@
 
     <section class="hero">
       <h2>Învață mai inteligent. <span class="hero-accent">Testează-te mai bine.</span></h2>
-      <p>Creează grile personalizate, exersează seriile numerice și urmărește-ți rezultatele într-o interfață construită pentru sesiuni rapide și concentrate.</p>
+      <p>Creează grile personalizate, exersează seriile numerice și urmărește-ți rezultatele într-o interfață modernă.</p>
     </section>
 
     <div class="nav-tabs">
@@ -82,27 +86,25 @@
     <div id="viewCreate" class="card">
       <div class="section-heading">
         <div>
-          <div class="eyebrow">Configurare</div>
-          <h3>Construiește următoarea sesiune</h3>
-          <p>Alege numărul de întrebări și tipul de test.</p>
+          <div style="font-size:0.75rem; font-weight:700; color:var(--accent-light); text-transform:uppercase; letter-spacing:0.05em;">Configurare</div>
+          <h3 style="font-size:1.3rem; margin-top:2px;">Construiește următoarea sesiune</h3>
         </div>
       </div>
 
       <div class="setting-card">
         <div>
-          <div class="setting-icon">⚙️</div>
-          <label for="questionCountInput">Câte întrebări dorești?</label>
-          <small>Poți genera între 1 și 25 de întrebări.</small>
+          <label for="questionCountInput" style="font-weight:700; display:block;">Câte întrebări dorești?</label>
+          <small style="color:var(--muted);">Alege un număr între 1 și 25 de întrebări.</small>
         </div>
         <input type="number" id="questionCountInput" min="1" max="25" value="5" placeholder="5">
       </div>
 
       <div class="category-block">
         <div class="category-head">
-          <div class="category-icon icon-violet">🎓</div>
+          <div class="category-icon">🎓</div>
           <div>
             <h3>Academia de Poliție „Alexandru Ioan Cuza”</h3>
-            <p>Grile de nivel avansat, concepute pentru antrenament pe materiile de admitere.</p>
+            <p style="font-size:0.85rem; color:var(--muted);">Grile de nivel avansat, concepute pentru admitere.</p>
           </div>
         </div>
         <div class="grid-buttons">
@@ -114,10 +116,10 @@
 
       <div class="category-block">
         <div class="category-head">
-          <div class="category-icon icon-blue">🧠</div>
+          <div class="category-icon">🧠</div>
           <div>
             <h3>Test psihologic · Serii numerice</h3>
-            <p>Șiruri și reguli matematice pe care trebuie să le identifici rapid.</p>
+            <p style="font-size:0.85rem; color:var(--muted);">Șiruri și reguli matematice rapide.</p>
           </div>
         </div>
         <button class="btn btn-police" onclick="generateQuiz('psych')">🔢 Start test serii numerice</button>
@@ -125,21 +127,19 @@
 
       <div class="category-block">
         <div class="category-head">
-          <div class="category-icon icon-indigo">💡</div>
+          <div class="category-icon">💡</div>
           <div>
-            <h3>Test personalizat pe orice subiect</h3>
-            <p>Introdu tema dorită: legislație, informatică, coduri, cultură generală etc.</p>
+            <h3>Test personalizat</h3>
+            <p style="font-size:0.85rem; color:var(--muted);">Introdu orice temă dorești (ex: legislație, IT, cultură generală).</p>
           </div>
         </div>
         <div class="topic-wrap">
           <div class="form-group">
-            <label for="topicInput">Subiectul dorit</label>
             <input type="text" id="topicInput" placeholder="Ex: Legislație rutieră OUG 195/2002...">
           </div>
           <button class="btn btn-primary" onclick="generateQuiz('general')">⚡ Generează test personalizat</button>
         </div>
       </div>
-      <div class="footer-note">Datele testelor sunt păstrate local în browserul tău.</div>
     </div>
 
     <!-- TAB RULARE TEST -->
@@ -149,20 +149,20 @@
       <div class="quiz-top">
         <div>
           <span class="quiz-chip">● Test activ</span>
-          <h2 id="quizTitle" style="margin-top:8px;">-</h2>
+          <h2 id="quizTitle" style="margin-top:8px; font-size:1.25rem;">-</h2>
         </div>
-        <span id="quizProgress">-</span>
+        <span id="quizProgress" style="font-weight:700; color:var(--accent-light);">-</span>
       </div>
 
       <div id="questionContainer">
         <div class="question-card">
-          <h3 id="questionText">-</h3>
+          <h3 id="questionText" style="font-size:1.1rem; line-height:1.5; margin-bottom:16px;">-</h3>
           <div id="optionsContainer"></div>
           <div id="explanationBox" class="explanation hidden"></div>
         </div>
       </div>
 
-      <div id="quizFooter" class="hidden" style="margin-top:18px;">
+      <div id="quizFooter" class="hidden" style="margin-top:24px;">
         <button id="btnNext" class="btn btn-primary" onclick="nextQuestion()">Următoarea întrebare <span>→</span></button>
       </div>
 
@@ -170,22 +170,22 @@
       <div id="summaryContainer" class="hidden result-hero">
         <div class="result-icon">🎯</div>
         <h2>Test finalizat!</h2>
-        <p style="font-size:.82rem;color:var(--muted);margin:7px 0 2px;">Scorul tău obținut</p>
+        <p style="font-size:0.9rem; color:var(--muted); margin-top:4px;">Scorul obținut de tine:</p>
         <div id="finalScore">-</div>
-        <p id="emailStatus" style="font-size:.78rem;color:var(--muted);">Se trimit rezultatele...</p>
+        <p id="emailStatus" style="font-size:0.82rem; color:var(--muted); margin-bottom:16px;">Se trimit rezultatele...</p>
         <div class="result-actions">
           <button class="btn btn-primary" onclick="switchTab('create')">Creează alt test</button>
-          <button class="btn btn-police" onclick="switchTab('history')">Vezi testele anterioare</button>
+          <button class="btn btn-police" onclick="switchTab('history')">Vezi istoricul</button>
         </div>
       </div>
     </div>
 
     <!-- TAB ISTORIC -->
     <div id="viewHistory" class="card hidden">
-      <div class="history-toolbar">
+      <div class="history-toolbar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
         <div>
           <h3>Istoricul testelor</h3>
-          <p>Vezi rapid sesiunile finalizate și scorurile obținute.</p>
+          <p style="font-size:0.85rem; color:var(--muted);">Toate sesiunile tale salvate local.</p>
         </div>
         <button class="btn-link" style="color:var(--red)" onclick="clearHistory()">Șterge istoricul</button>
       </div>
